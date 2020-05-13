@@ -13,8 +13,8 @@ def hello_world():
 
 @app.route('/test', methods = ['POST'])
 def update_text():
-    data = request.form
-    print(data) #fix this data to read 
+    print(request.json)
     return {"mensaje":"ok"}
 
-    
+if __name__ == '__main__':
+    app.run(port=3000,debug=True)
