@@ -1,7 +1,7 @@
 import requests
-
+import time
 from jpake import JPAKE
-
+ 
 
 url = 'http://127.0.0.1:3000/test'
 url2 = 'http://127.0.0.1:3000/test2'
@@ -15,7 +15,8 @@ response = requests.post(url, json={
         "gx2": bob.gx2
     })
 response.status_code
-print(response.json())
+
+#print(response.json())
 data = response.json()
 #print(type(data))
 data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
@@ -28,8 +29,11 @@ data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
 #alice first process
 bob.process_one(data)
 
-
-response2 = requests.post(url2, json={"A":bob.A,"zkp_A":bob.zkp_A})
+print(bob.zkp_A)
+response2 = requests.post(url2, json={
+    "A":bob.A, 
+    "zkp_A":{"gr": bob.zkp_A['gr'], "b":bob.zkp_A['b'],"id":bob.zkp_A['id'].decode('utf-8')}
+})
 print(response2.json())
 
 print('ok')
