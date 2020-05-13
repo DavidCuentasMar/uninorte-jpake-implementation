@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+import json
 app = Flask(__name__)
 
 from jpake import JPAKE
@@ -13,17 +14,18 @@ def hello_world():
 
 @app.route('/test', methods = ['POST'])
 def update_text():
-    
+    data = request.get_json()
+    print(type(data))
+    data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
+    data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
     #print(request.json)
-    obj = request.json
-    #print(obj)
-    print(obj.zkp_x1)
+    #loaded_json = json.loads(request.json)
+    #obj = request.json
+    #print(loaded_json)
+    #print(obj.zkp_x1)
     
     #alice first process
-    # alice.process_one(
-        # remote_gx1=obj['gx1'], remote_zkp_x1=obj['zkp_x1'],
-        # remote_gx2=obj['gx2'], remote_zkp_x2=obj['zkp_x2'],
-    # )
+    alice.process_one(data)
     return {"mensaje":"ok"}
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ secret = "1234"
 alice = JPAKE(secret=secret, signer_id=b"alice")
 bob = JPAKE(secret=secret, signer_id=b"bob")
 
-print(bob.zkp_x1)
+print(type(bob.one()))
 
 # alice.process_one(bob.one())
 # bob.process_one(alice.one())
