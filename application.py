@@ -37,24 +37,24 @@ def update_text():
 def update_text2():
     print('TWO')
     data = request.get_json()
-    return {"msg":"ok"}
-    #data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
-    #data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
-    #print(request.json)
-    #loaded_json = json.loads(request.json)
-    #obj = request.json
-    #print(loaded_json)
-    #print(obj.zkp_x1)
-    
-    #alice first process
-    #alice.process_one(data)
-    #return {
-    #    "zkp_x1":{"gr": alice.zkp_x1['gr'], "b":alice.zkp_x1['b'],"id":alice.zkp_x1['id'].decode('utf-8')},
-    #    "zkp_x2":{"gr": alice.zkp_x2['gr'], "b":alice.zkp_x2['b'],"id":alice.zkp_x2['id'].decode('utf-8')},
-    #    "gx1": alice.gx1,
-    #    "gx2": alice.gx2
-    #}
 
+    data['zkp_A']['id'] = data['zkp_A']['id'].encode('utf-8')
+    print(request.json)
+    #loaded_json = json.loads(request.json)
+    #print(loaded_json)
+    
+    #alice second process
+    alice.process_two(data)
+
+    return {
+        "B":alice.A, 
+        "zkp_B":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
+    }
+
+@app.route('/test3', methods = ['POST'])
+def update_text3():
+    print(alice.k)
+    return {"msg":"tenemos el mismo secreto"}
 
 
 if __name__ == '__main__':

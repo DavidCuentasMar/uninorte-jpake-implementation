@@ -5,6 +5,7 @@ from jpake import JPAKE
 
 url = 'http://127.0.0.1:3000/test'
 url2 = 'http://127.0.0.1:3000/test2'
+url3 = 'http://127.0.0.1:3000/test3'
 secret = "1235"
 bob = JPAKE(secret=secret, signer_id=b"bob")
 
@@ -29,13 +30,22 @@ data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
 #alice first process
 bob.process_one(data)
 
-print(bob.zkp_A)
+#print(bob.zkp_A)
 response2 = requests.post(url2, json={
     "A":bob.A, 
     "zkp_A":{"gr": bob.zkp_A['gr'], "b":bob.zkp_A['b'],"id":bob.zkp_A['id'].decode('utf-8')}
 })
-print(response2.json())
 
-print('ok')
+#print(response2.json())
+data2 = response.json()
+print('string data2:')
+print(data2)
+data2['zkp_A']['id'] = data2['zkp_A']['id'].encode('utf-8')
 
+#bob second process
+bob.process_two(data)
 
+print(bob.k)
+
+response3 = requests.post(url2, json={"msg": "ey alice todo ok"})
+print(response3.json())
