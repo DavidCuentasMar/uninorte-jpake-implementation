@@ -3,7 +3,7 @@ import requests
 from jpake import JPAKE
 
 
-url = 'http://127.0.0.1:3000/test'
+url = 'http://127.0.0.1:5000/test'
 
 secret = "1235"
 bob = JPAKE(secret=secret, signer_id=b"bob")
