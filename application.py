@@ -15,7 +15,7 @@ def hello_world():
 @app.route('/test', methods = ['POST'])
 def update_text():
     data = request.get_json()
-    print(type(data))
+    #print(type(data))
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
     data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
     #print(request.json)
@@ -35,27 +35,26 @@ def update_text():
 
 @app.route('/test2', methods = ['POST'])
 def update_text2():
-    print('TWO')
+    #print('TWO')
     data = request.get_json()
 
     data['zkp_A']['id'] = data['zkp_A']['id'].encode('utf-8')
-    print(request.json)
+    #print(request.json)
     #loaded_json = json.loads(request.json)
     #print(loaded_json)
     
     #alice second process
     alice.process_two(data)
-
+    print(alice.K)
     return {
-        "B":alice.A, 
-        "zkp_B":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
+        "A":alice.A, 
+        "zkp_A":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
     }
-
 @app.route('/test3', methods = ['POST'])
 def update_text3():
-    print(alice.k)
+    print(alice.K)
     return {"msg":"tenemos el mismo secreto"}
 
 
 if __name__ == '__main__':
-    app.run(port=3000,debug=True)
+    app.run(port=3000,debug=True) 

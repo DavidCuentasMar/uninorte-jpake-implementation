@@ -37,15 +37,16 @@ response2 = requests.post(url2, json={
 })
 
 #print(response2.json())
-data2 = response.json()
-print('string data2:')
-print(data2)
+data2 = response2.json()
+#print('string data2:')
+#print(data2)
 data2['zkp_A']['id'] = data2['zkp_A']['id'].encode('utf-8')
-
+#print('---')
+#print(data2)
 #bob second process
-bob.process_two(data)
+bob.process_two(data2)
 
-print(bob.k)
+print(bob.K)
 
-response3 = requests.post(url2, json={"msg": "ey alice todo ok"})
-print(response3.json())
+##response3 = requests.post(url2, json={"msg": "ey alice todo ok"})
+##print(response3.json())
