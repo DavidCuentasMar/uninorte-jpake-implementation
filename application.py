@@ -2,10 +2,19 @@ from flask import Flask
 from flask import request
 import json
 app = Flask(__name__)
+from jpake import JPAKE
+import hmac 
+from Crypto.Hash import SHA256
+from Crypto.Cipher import AES
 
 from jpake import JPAKE
 
-secret = "1235"
+bobId = b''
+key = b''
+jPakeKey = b'mensage'
+iv = 'This is an IV456'
+
+secret = "secretWithLessEntropy"
 alice = JPAKE(secret=secret, signer_id=b"alice")
 
 @app.route('/')
@@ -20,6 +29,7 @@ def firstMessage():
     data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
 
     alice.process_one(data)
+    
     return {
         "zkp_x1":{"gr": alice.zkp_x1['gr'], "b":alice.zkp_x1['b'],"id":alice.zkp_x1['id'].decode('utf-8')},
         "zkp_x2":{"gr": alice.zkp_x2['gr'], "b":alice.zkp_x2['b'],"id":alice.zkp_x2['id'].decode('utf-8')},
@@ -33,9 +43,6 @@ def secondMessage():
     data = request.get_json()
     print(data)
     data['zkp_A']['id'] = data['zkp_A']['id'].encode('utf-8')
-    #print(request.json)
-    #loaded_json = json.loads(request.json)
-    #print(loaded_json)
     
     #alice second process
     alice.process_two(data)
@@ -44,10 +51,44 @@ def secondMessage():
         "A":alice.A, 
         "zkp_A":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
     }
+
 @app.route('/onlyForProveTheKey', methods = ['POST'])
 def onlyForProveTheKey():
     print(alice.K)
     return {"msg":"tenemos el mismo secreto pero no te lo puedo decir jeje"}
+
+@app.route('/secureChannel', methods = ['POST'])
+def secureChannel():
+
+    data = request.get_json()
+
+    ciphertext = data.msg
+    tBob = data.t
+
+    key = jPakeKey + bobId + alice.signer_id
+    hash = SHA256.new()
+    hash.update(key)
+    shaResult = hash.hexdigest()
+    print(shaResult)
+    sha_e = shaResult[0:32]
+    sha_m = shaResult[32:64]
+    print(sha_e)
+    print(sha_m)
+
+    bSha_m = bytes(sha_e, 'utf-8')
+    objT = hmac.new(bSha_m,ciphertext)
+    t = objT.digest()
+
+    try:
+        if hmac.compare_digest(t, tBob):
+            obj2 = AES.new(sha_e, AES.MODE_CBC, iv)
+            mensaje = obj2.decrypt(ciphertext)
+            print(mensaje)
+    except:
+        print('ocurrió un error con la verificación de t')
+        return {"msg":"alguien está en el canal o simplemente ocurrió un erro"}
+
+    return {"msg":"mensaje recibido"}
 
 
 if __name__ == '__main__':
