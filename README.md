@@ -26,6 +26,8 @@
 
     $ flask run
 
+    $ flask run --port=3000
+
 7 Run the client
 
     $ python3 clientflask.py
@@ -44,6 +46,8 @@
 3 Run flask
 
     $ flask run
+
+    $ flask --port=3000
 
 4 Run the client
 

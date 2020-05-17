@@ -7,6 +7,8 @@ url = 'http://127.0.0.1:3000/test'
 url2 = 'http://127.0.0.1:3000/test2'
 url3 = 'http://127.0.0.1:3000/test3'
 secret = "1235"
+
+
 bob = JPAKE(secret=secret, signer_id=b"bob")
 
 response = requests.post(url, json={
@@ -15,11 +17,12 @@ response = requests.post(url, json={
         "gx1": bob.gx1,
         "gx2": bob.gx2
     })
+
 response.status_code
 
 #print(response.json())
 data = response.json()
-#print(type(data))
+print(data)
 data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
 data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
 #print(response.json)
@@ -36,13 +39,12 @@ response2 = requests.post(url2, json={
     "zkp_A":{"gr": bob.zkp_A['gr'], "b":bob.zkp_A['b'],"id":bob.zkp_A['id'].decode('utf-8')}
 })
 
-#print(response2.json())
+
 data2 = response2.json()
-#print('string data2:')
-#print(data2)
+print(data2)
 data2['zkp_A']['id'] = data2['zkp_A']['id'].encode('utf-8')
-#print('---')
-#print(data2)
+
+
 #bob second process
 bob.process_two(data2)
 
