@@ -18,13 +18,7 @@ def firstMessage():
     print(data)
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
     data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
-    #print(request.json)
-    #loaded_json = json.loads(request.json)
-    #obj = request.json
-    #print(loaded_json)
-    #print(obj.zkp_x1)
-    
-    #alice first process
+
     alice.process_one(data)
     return {
         "zkp_x1":{"gr": alice.zkp_x1['gr'], "b":alice.zkp_x1['b'],"id":alice.zkp_x1['id'].decode('utf-8')},
