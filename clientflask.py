@@ -5,13 +5,13 @@ import hmac
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 
-aliceId = b'alice'
-jPakeKey = b'mensage'
+aliceId = b'el-id-de-alice'
+key=b'la-llave-para-introducir-en-sha'
 iv = 'This is an IV456'
 
-firstUrl = 'http://127.0.0.1:3000/fisrtMessage'
-secondUrl = 'http://127.0.0.1:3000/secondMessage'
-thirdUrl = 'http://127.0.0.1:3000/onlyForProveTheKey'
+firstUrl = 'http://127.0.0.1:3000/firstmessage'
+secondUrl = 'http://127.0.0.1:3000/secondmessage'
+thirdUrl = 'http://127.0.0.1:3000/funny'
 secureUrl = 'http://127.0.0.1:3000/secureChannel'
 
 secret = "secretWithLessEntropy"
@@ -27,9 +27,9 @@ try:
     })
 
     data = firstResponse.json()
-    print(data)
+    #print(data)
     
-    aliceId = data['zkp_x2']['id']
+    aliceId =bytes(data['zkp_x2']['id'], 'utf-8') 
 
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
     data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
@@ -46,15 +46,17 @@ try:
     })
 
     data2 = secondResponse.json()
-    print(data2)
+    
     data2['zkp_A']['id'] = data2['zkp_A']['id'].encode('utf-8')
+    #print(data2)
 
     #bob second process
     bob.process_two(data2)
-
-    print(bob.K)
-    jPakeKey = bob.k
-    key = bob.k+bob.signer_id+data['zkp_x2']['id']
+    time.sleep(1)
+    print(bob.k)
+    #key = bob.k+bob.signer_id+data['zkp_x2']['id']
+except ValueError:
+    print('error:'+ValueError)
 except:
     print('error en el segundo mensaje')
 
@@ -64,7 +66,7 @@ except:
 # except:
 #     print('error en el tercer mensaje')
 
-key = jPakeKey + bob.signer_id + aliceId
+key = bytes(str(bob.K), 'utf-8') + bob.signer_id + aliceId
 hash = SHA256.new()
 hash.update(key)
 shaResult = hash.hexdigest()

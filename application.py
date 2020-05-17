@@ -7,11 +7,8 @@ import hmac
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 
-from jpake import JPAKE
-
-bobId = b''
-key = b''
-jPakeKey = b'mensage'
+bobId = b'el-id-de-bob'
+key = b'la-llave-para-introducir-en-sha'
 iv = 'This is an IV456'
 
 secret = "secretWithLessEntropy"
@@ -21,15 +18,18 @@ alice = JPAKE(secret=secret, signer_id=b"alice")
 def hello_world():
     return 'soy Alice'
 
-@app.route('/firstMessage', methods = ['POST'])
+@app.route('/firstmessage', methods = ['POST'])
 def firstMessage():
+
     data = request.get_json()
-    print(data)
+    #print(data)
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
     data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
 
+    bobId = data['zkp_x2']['id']
+
+    print(bobId)
     alice.process_one(data)
-    
     return {
         "zkp_x1":{"gr": alice.zkp_x1['gr'], "b":alice.zkp_x1['b'],"id":alice.zkp_x1['id'].decode('utf-8')},
         "zkp_x2":{"gr": alice.zkp_x2['gr'], "b":alice.zkp_x2['b'],"id":alice.zkp_x2['id'].decode('utf-8')},
@@ -37,27 +37,27 @@ def firstMessage():
         "gx2": alice.gx2
     }
 
-@app.route('/secondMessage', methods = ['POST'])
+@app.route('/secondmessage', methods = ['POST'])
 def secondMessage():
     #print('TWO')
     data = request.get_json()
-    print(data)
-    data['zkp_A']['id'] = data['zkp_A']['id'].encode('utf-8')
     
+    data['zkp_A']['id'] = data['zkp_A']['id'].encode('utf-8')
+    print(data)
     #alice second process
     alice.process_two(data)
-    #print(alice.K)
+    print(alice.K)
     return {
         "A":alice.A, 
         "zkp_A":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
     }
 
-@app.route('/onlyForProveTheKey', methods = ['POST'])
-def onlyForProveTheKey():
+@app.route('/funny', methods = ['POST'])
+def funny():
     print(alice.K)
     return {"msg":"tenemos el mismo secreto pero no te lo puedo decir jeje"}
 
-@app.route('/secureChannel', methods = ['POST'])
+@app.route('/securechannel', methods = ['POST'])
 def secureChannel():
 
     data = request.get_json()
@@ -65,7 +65,7 @@ def secureChannel():
     ciphertext = data.msg
     tBob = data.t
 
-    key = jPakeKey + bobId + alice.signer_id
+    key = bytes(str(alice.K), 'utf-8') + bobId + alice.signer_id
     hash = SHA256.new()
     hash.update(key)
     shaResult = hash.hexdigest()
