@@ -12,8 +12,8 @@ alice = JPAKE(secret=secret, signer_id=b"alice")
 def hello_world():
     return 'soy Alice'
 
-@app.route('/test', methods = ['POST'])
-def update_text():
+@app.route('/firstMessage', methods = ['POST'])
+def firstMessage():
     data = request.get_json()
     print(data)
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
@@ -33,8 +33,8 @@ def update_text():
         "gx2": alice.gx2
     }
 
-@app.route('/test2', methods = ['POST'])
-def update_text2():
+@app.route('/secondMessage', methods = ['POST'])
+def secondMessage():
     #print('TWO')
     data = request.get_json()
     print(data)
@@ -50,10 +50,10 @@ def update_text2():
         "A":alice.A, 
         "zkp_A":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
     }
-@app.route('/test3', methods = ['POST'])
-def update_text3():
-    #print(alice.K)
-    return {"msg":"tenemos el mismo secreto"}
+@app.route('/onlyForProveTheKey', methods = ['POST'])
+def onlyForProveTheKey():
+    print(alice.K)
+    return {"msg":"tenemos el mismo secreto pero no te lo puedo decir jeje"}
 
 
 if __name__ == '__main__':

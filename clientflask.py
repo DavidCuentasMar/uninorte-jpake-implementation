@@ -5,6 +5,7 @@ import hashlib
 from Crypto.Hash import SHA256
 
 aliceId = b'alice'
+jPakeKey = b'mensage'
 
 url = 'http://127.0.0.1:3000/fisrtMessage'
 url2 = 'http://127.0.0.1:3000/secondMessage'
@@ -36,7 +37,7 @@ try:
     #bob first process
     bob.process_one(data)
 except:
-    print('error')
+    print('error en el primer mensaje')
 
 try:
     response2 = requests.post(url2, json={
@@ -52,17 +53,23 @@ try:
     bob.process_two(data2)
 
     print(bob.K)
+    jPakeKey = bob.k
     key = bob.k+bob.signer_id+data['zkp_x2']['id']
 except:
-    print('otro error')
+    print('error en el segundo mensaje')
 
+try:
+    response3 = requests.post(url2, json={"msg": "ey alice todo ok"})
+    print(response3.json())
+except:
+    print('error en el tercer mensaje')
 
-
-key2 = b'msg'+ bob.signer_id + 
-key = bob.signer_id
+key = jPakeKey+ bob.signer_id + aliceId
 hash = SHA256.new()
-hash.update(key2)
-print(hash.digest())
-
-##response3 = requests.post(url2, json={"msg": "ey alice todo ok"})
-##print(response3.json())
+hash.update(key)
+shaResult = hash.hexdigest()
+print(shaResult)
+sha_e = shaResult[0:32]
+sha_m = shaResult[32:64]
+print(sha_e)
+print(sha_m)
