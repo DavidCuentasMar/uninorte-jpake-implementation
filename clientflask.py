@@ -52,11 +52,8 @@ try:
 
     #bob second process
     bob.process_two(data2)
-    time.sleep(1)
-    print(bob.k)
+
     #key = bob.k+bob.signer_id+data['zkp_x2']['id']
-except ValueError:
-    print('error:'+ValueError)
 except:
     print('error en el segundo mensaje')
 
@@ -70,25 +67,31 @@ key = bytes(str(bob.K), 'utf-8') + bob.signer_id + aliceId
 hash = SHA256.new()
 hash.update(key)
 shaResult = hash.hexdigest()
-print(shaResult)
+#print(shaResult)
 sha_e = shaResult[0:32]
 sha_m = shaResult[32:64]
-print(sha_e)
-print(sha_m)
+#print(sha_e)
+#print(sha_m)
 
 obj = AES.new(sha_e, AES.MODE_CBC, iv)
-message = "The answer is no"
+message = "the answer is no"
 ciphertext = obj.encrypt(message)
 print(ciphertext)
 
 bSha_m = bytes(sha_e, 'utf-8')
 objT = hmac.new(bSha_m,ciphertext)
 
-t = objT.digest()
-# print(t) send t to Alice
+t = objT.digest() 
+print(t) #send t to Alice
+#print(type(t)) #send t to Alice
 
-try:
-    secureChannelResponse = requests.post(secureUrl, json={"t":t, "msg": ciphertext})
-    print(secureChannelResponse.json())
-except:
-    print('error en el canal seguro')  
+t_to_send = str(t)
+ciphertext_to_send = str(ciphertext)
+
+print(type(ciphertext_to_send))
+print(ciphertext_to_send)
+print(type(t_to_send))
+print(t_to_send)
+
+secureChannelResponse = requests.post(secureUrl, json={"t":t_to_send, "msg": ciphertext_to_send})
+print(secureChannelResponse.json())

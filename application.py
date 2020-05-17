@@ -28,7 +28,6 @@ def firstMessage():
 
     bobId = data['zkp_x2']['id']
 
-    print(bobId)
     alice.process_one(data)
     return {
         "zkp_x1":{"gr": alice.zkp_x1['gr'], "b":alice.zkp_x1['b'],"id":alice.zkp_x1['id'].decode('utf-8')},
@@ -43,10 +42,11 @@ def secondMessage():
     data = request.get_json()
     
     data['zkp_A']['id'] = data['zkp_A']['id'].encode('utf-8')
-    print(data)
+    #print(data)
+    
     #alice second process
     alice.process_two(data)
-    print(alice.K)
+
     return {
         "A":alice.A, 
         "zkp_A":{"gr": alice.zkp_A['gr'], "b":alice.zkp_A['b'],"id":alice.zkp_A['id'].decode('utf-8')}
@@ -62,8 +62,8 @@ def secureChannel():
 
     data = request.get_json()
 
-    ciphertext = data.msg
-    tBob = data.t
+    ciphertext = bytes(data.msg, 'utf-8')
+    tBob = bytes(data.t, 'utf-8')
 
     key = bytes(str(alice.K), 'utf-8') + bobId + alice.signer_id
     hash = SHA256.new()
@@ -72,8 +72,8 @@ def secureChannel():
     print(shaResult)
     sha_e = shaResult[0:32]
     sha_m = shaResult[32:64]
-    print(sha_e)
-    print(sha_m)
+    #print(sha_e)
+    #print(sha_m)
 
     bSha_m = bytes(sha_e, 'utf-8')
     objT = hmac.new(bSha_m,ciphertext)
