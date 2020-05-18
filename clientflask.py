@@ -12,11 +12,27 @@ iv = 'This is an IV456'
 firstUrl = 'http://127.0.0.1:3000/firstmessage'
 secondUrl = 'http://127.0.0.1:3000/secondmessage'
 thirdUrl = 'http://127.0.0.1:3000/funny'
-secureUrl = 'http://127.0.0.1:3000/secureChannel'
+secureUrl = 'http://127.0.0.1:3000/securechannel'
 
 secret = "secretWithLessEntropy"
 
 bob = JPAKE(secret=secret, signer_id=b"bob")
+
+def bytesToString(bytesToFormat):
+    string = ''
+
+    for byte in bytesToFormat:
+        string = string+'-'+ str(byte)
+
+    return string    
+
+def stringToBytes(stringToFormat):
+    stringCut = stringToFormat.split('-')
+    bytesCode = b''
+    for eachPos in stringCut:
+        if eachPos != '':
+            bytesCode = bytesCode + bytes([int(eachPos)]) 
+    return bytesCode  
 
 try:
     firstResponse = requests.post(firstUrl, json={
@@ -64,34 +80,41 @@ except:
 #     print('error en el tercer mensaje')
 
 key = bytes(str(bob.K), 'utf-8') + bob.signer_id + aliceId
+
+print('el valor de key')
+print(key)
 hash = SHA256.new()
 hash.update(key)
 shaResult = hash.hexdigest()
-#print(shaResult)
+print('el valor del sha')
+print(shaResult)
 sha_e = shaResult[0:32]
 sha_m = shaResult[32:64]
-#print(sha_e)
-#print(sha_m)
+print(sha_e)
+print(sha_m)
 
 obj = AES.new(sha_e, AES.MODE_CBC, iv)
 message = "the answer is no"
 ciphertext = obj.encrypt(message)
 print(ciphertext)
 
-bSha_m = bytes(sha_e, 'utf-8')
-objT = hmac.new(bSha_m,ciphertext)
+bSha_m = bytes(sha_m, 'utf-8')
+objT = hmac.new(bSha_m, ciphertext)
 
 t = objT.digest() 
-print(t) #send t to Alice
-#print(type(t)) #send t to Alice
+print(t)
+print(str(t))
 
-t_to_send = str(t)
-ciphertext_to_send = str(ciphertext)
 
-print(type(ciphertext_to_send))
-print(ciphertext_to_send)
-print(type(t_to_send))
+t_to_send = bytesToString(t)
+ciphertext_to_send = str(ciphertext)[2:-1]
+
+
+print('valor de t')
 print(t_to_send)
+print('valor de la variable de texto cifrado')
+print(ciphertext_to_send)
 
+print('ya va a enviar')
 secureChannelResponse = requests.post(secureUrl, json={"t":t_to_send, "msg": ciphertext_to_send})
-print(secureChannelResponse.json())
+print(t_to_send)

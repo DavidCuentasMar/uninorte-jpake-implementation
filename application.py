@@ -7,7 +7,7 @@ import hmac
 from Crypto.Hash import SHA256
 from Crypto.Cipher import AES
 
-bobId = b'el-id-de-bob'
+bobId = b'un-valor-incorrecto-dl-id'
 key = b'la-llave-para-introducir-en-sha'
 iv = 'This is an IV456'
 
@@ -26,6 +26,7 @@ def firstMessage():
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
     data['zkp_x2']['id'] = data['zkp_x2']['id'].encode('utf-8')
 
+    global bobId
     bobId = data['zkp_x2']['id']
 
     alice.process_one(data)
@@ -59,25 +60,38 @@ def funny():
 
 @app.route('/securechannel', methods = ['POST'])
 def secureChannel():
-
+    
     data = request.get_json()
-
-    ciphertext = bytes(data.msg, 'utf-8')
-    tBob = bytes(data.t, 'utf-8')
+    print(data)
+    
+    ciphertext = data['msg'].encode('utf-8')
+    tBob = bytes(data['t'], 'utf-8')
 
     key = bytes(str(alice.K), 'utf-8') + bobId + alice.signer_id
+    print('el valor de key')
+    print(key)
     hash = SHA256.new()
     hash.update(key)
     shaResult = hash.hexdigest()
+    print('el valor del sha')
     print(shaResult)
     sha_e = shaResult[0:32]
     sha_m = shaResult[32:64]
-    #print(sha_e)
-    #print(sha_m)
+    print(sha_e)
+    print(sha_m)
 
-    bSha_m = bytes(sha_e, 'utf-8')
-    objT = hmac.new(bSha_m,ciphertext)
+    print('el valor de la variable de texto cifrado')
+    print(ciphertext)
+
+    bSha_m = bytes(sha_m, 'utf-8')
+    objT = hmac.new(bSha_m, ciphertext)
     t = objT.digest()
+
+    print('el valor de t')
+    print(t)
+    print('el valor del t de bob')
+    print(tBob)
+    print('va a cortar a tBob')
 
     try:
         if hmac.compare_digest(t, tBob):
