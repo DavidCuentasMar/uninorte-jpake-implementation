@@ -81,7 +81,7 @@ sha_m = shaResult[32:64]
 objAES = AES.new(sha_e, AES.MODE_CBC, iv)
 
 # Input strings must be a multiple of 16 in length
-message = "the answer is ye"
+message = "the answer isyes"
 ciphertext = objAES.encrypt(message)
 
 # calculamos el t con hmac
