@@ -20,10 +20,8 @@ bob = JPAKE(secret=secret, signer_id=b"bob")
 
 def bytesToString(bytesToFormat):
     string = ''
-
     for byte in bytesToFormat:
         string = string+'-'+ str(byte)
-
     return string    
 
 def stringToBytes(stringToFormat):
@@ -43,8 +41,6 @@ try:
     })
 
     data = firstResponse.json()
-    #print(data)
-    
     aliceId =bytes(data['zkp_x2']['id'], 'utf-8') 
 
     data['zkp_x1']['id'] = data['zkp_x1']['id'].encode('utf-8')
@@ -62,58 +58,43 @@ try:
     })
 
     data2 = secondResponse.json()
-    
     data2['zkp_A']['id'] = data2['zkp_A']['id'].encode('utf-8')
-    #print(data2)
 
     #bob second process
     bob.process_two(data2)
-
-    #key = bob.k+bob.signer_id+data['zkp_x2']['id']
 except:
     print('error en el segundo mensaje')
 
-# try:
-#     thirdResponse = requests.post(thirdUrl, json={"msg": "ey alice todo ok"})
-#     print(thirdResponse.json())
-# except:
-#     print('error en el tercer mensaje')
-
+# creación de la nueva key para trabar con el Sha256 y Hmac
 key = bytes(str(bob.K), 'utf-8') + bob.signer_id + aliceId
 
-print('el valor de key')
-print(key)
+# Calculo del Sha256
 hash = SHA256.new()
 hash.update(key)
 shaResult = hash.hexdigest()
-print('el valor del sha')
-print(shaResult)
+
+# particion del Sha para transformarlo en 2 nuevas llaves
 sha_e = shaResult[0:32]
 sha_m = shaResult[32:64]
-print(sha_e)
-print(sha_m)
 
-obj = AES.new(sha_e, AES.MODE_CBC, iv)
-message = "the answer is no"
-ciphertext = obj.encrypt(message)
-print(ciphertext)
+# Se configura el cifrador de AES en modo CBC
+objAES = AES.new(sha_e, AES.MODE_CBC, iv)
 
+# Input strings must be a multiple of 16 in length
+message = "the answer is ye"
+ciphertext = objAES.encrypt(message)
+
+# calculamos el t con hmac
 bSha_m = bytes(sha_m, 'utf-8')
-objT = hmac.new(bSha_m, ciphertext)
+objHmac = hmac.new(bSha_m, ciphertext)
+t = objHmac.digest() 
 
-t = objT.digest() 
-print(t)
-print(str(t))
-
-
+# transformamos los formatos de bytes en string 
+# para poder enviar con nuestra implementación
 t_to_send = bytesToString(t)
 ciphertext_to_send = bytesToString(ciphertext)
 
-print('valor de t')
-print(t_to_send)
-print('valor de la variable de texto cifrado')
-print(ciphertext_to_send)
-
-print('ya va a enviar')
 secureChannelResponse = requests.post(secureUrl, json={"t":t_to_send, "msg": ciphertext_to_send})
-print(t_to_send)
+print('mensaje enviado a Alice')
+print('Respuesta de alice:')
+print(secureChannelResponse.json())

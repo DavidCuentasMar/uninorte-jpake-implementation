@@ -1,34 +1,41 @@
-# 1. implementar AES con Sha
+# 1. calcular una nueva llave con Sha256
 
-- AES en MODO CBC GSM (mejor modo) cifra y authentica
-- y un sha 256 - keySha = sha(key-j-pake + id_a + id_b)
+key = sha(j-pake-key + id_bob + id_alice)
 
-keySha = 0000000000000000000000000000000000 | 111111111111111111111111111111111
+sha_e  = key.truncate(0:127) 
+sha_e  = key.truncate(128:256)
 
-k_e = keySha.truncate(128)   0000000000000000000000000000000000 
-k_m = keySha.truncate() 111111111111111111111
+# 2. cifrar el texto plano con AES en modo CBC
 
-# 2. implentar HMAC
+se tiene un textoPlano y un iv de inicialización
 
-- H-MAC codigo de authenticacion (con los 128 bits qeu sobraron del trunqueo) -> me regresa C y T
+textoCifrado = AES(sha_e, MODO-CBC, iv)
+c <----- E_CBC(sha_e, m)
 
-m = mensaje
+# 3. Bob calcula un t usando Hmac para validar el mensaje
 
-c <----- E_CBC(k_e, m)
+luego se toma la otra parte del sha y el texto cifrado para calcular un t el cual va a validar el mensaje cuando llegue al receptor
 
-c = texto cifrado con AES
+t <------ HMAC(sha_m, c)
 
-t <------ HMAC(k_m, c)
-
-# 3. Enviar c y t al servidor (quien en envia)
+# 3. Enviar c y t al servidor (Bob es quien en envia)
  
-Del otro lado (del que recibe)
+se implementaron dos metodos para poder hacer este envió posible, ya que el texto cifrado y el valor de t se encontraban en bytes y era necesario llevarlo a una forma que fuesen JSON serializable
 
-tomar c y computar t'<----Hmac(k_m, c)
-verificar si t' es igual a t
+metodos implementados:
 
-otra froma de verlo o como el profesor creyo que va a estar implementado
-- V(km, t, m) ---> Fslso o verdadero
+- bytesToString
+- stringToBytes 
 
-# 4. descifrar
-m<----D_CBC(ke, c)
+
+# 4. Quien recibe toma el mensaje y lo valida con t y c
+
+Del lado de Alice en nuestra implementacion: 
+tomamos c y t y computamos t'<----Hmac(sha_m, c)
+
+si t' es igual a t entonces el mensaje es mostrado
+de lo contrario el c o el t enviados fueron comprometidos
+
+# 4. Por ultimo se descifra el mensaje del lado de Alice
+
+mensajeOriginal <----D_CBC(sha_e, c)
