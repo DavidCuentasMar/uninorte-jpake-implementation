@@ -90,8 +90,8 @@ def secureChannel():
 
     try:
         if hmac.compare_digest(t, tBob):
-            objHmac2 = AES.new(sha_e, AES.MODE_CBC, iv)
-            mensaje = objHmac2.decrypt(ciphertext)
+            objAES = AES.new(sha_e, AES.MODE_CBC, iv)
+            mensaje = objAES.decrypt(ciphertext)
             print(mensaje)
     except:
         print('ocurrió un error con la verificación de t')
