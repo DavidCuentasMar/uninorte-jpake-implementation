@@ -14,6 +14,22 @@ iv = 'This is an IV456'
 secret = "secretWithLessEntropy"
 alice = JPAKE(secret=secret, signer_id=b"alice")
 
+def bytesToString(bytesToFormat):
+    string = ''
+
+    for byte in bytesToFormat:
+        string = string+'-'+ str(byte)
+
+    return string    
+
+def stringToBytes(stringToFormat):
+    stringCut = stringToFormat.split('-')
+    bytesCode = b''
+    for eachPos in stringCut:
+        if eachPos != '':
+            bytesCode = bytesCode + bytes([int(eachPos)]) 
+    return bytesCode 
+
 @app.route('/')
 def hello_world():
     return 'soy Alice'
@@ -64,8 +80,8 @@ def secureChannel():
     data = request.get_json()
     print(data)
     
-    ciphertext = data['msg'].encode('utf-8')
-    tBob = bytes(data['t'], 'utf-8')
+    ciphertext = stringToBytes(data['msg'])
+    tBob = stringToBytes(data['t'])
 
     key = bytes(str(alice.K), 'utf-8') + bobId + alice.signer_id
     print('el valor de key')

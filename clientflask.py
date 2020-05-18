@@ -107,8 +107,7 @@ print(str(t))
 
 
 t_to_send = bytesToString(t)
-ciphertext_to_send = str(ciphertext)[2:-1]
-
+ciphertext_to_send = bytesToString(ciphertext)
 
 print('valor de t')
 print(t_to_send)
