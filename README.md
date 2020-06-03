@@ -47,7 +47,7 @@
 
     $ flask run
 
-    $ flask --port=3000
+    $ flask run --port=3000 
 
 4 Run the client
 

@@ -72,10 +72,13 @@ key = bytes(str(bob.K), 'utf-8') + bob.signer_id + aliceId
 hash = SHA256.new()
 hash.update(key)
 shaResult = hash.hexdigest()
-
+print(shaResult)
+print(type(shaResult))
 # particion del Sha para transformarlo en 2 nuevas llaves
 sha_e = shaResult[0:32]
 sha_m = shaResult[32:64]
+print('tipo de dato shae')
+print(type(sha_e))
 
 # Se configura el cifrador de AES en modo CBC
 objAES = AES.new(sha_e, AES.MODE_CBC, iv)
@@ -83,6 +86,7 @@ objAES = AES.new(sha_e, AES.MODE_CBC, iv)
 # Input strings must be a multiple of 16 in length
 message = "the answer tt no"
 ciphertext = objAES.encrypt(message)
+print(ciphertext)
 
 # calculamos el t con hmac
 bSha_m = bytes(sha_m, 'utf-8')
